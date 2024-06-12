@@ -57,6 +57,7 @@ class Fields(BaseModel):
     aaffcfg: FieldValue = Field(..., alias='aaffcfg')
     restrictions: FieldValue = Field(..., alias='ограничения')
     agreement: FieldValue = Field(..., alias='Согласие_на_обработку')
+    full_name: FieldValue = Field(..., alias='ФИО')  # Adding the ФИО field
 
 class RequestModel(BaseModel):
     fields: Fields
@@ -65,7 +66,7 @@ class RequestModel(BaseModel):
 def send_log(message, level='INFO'):
     print(f'попали в send_log {message=}, {level=}')
     # requests.post(f'http://{HOST}:{PORT}/logs', json={'log_entry': message, 'log_level': level}, timeout=1)
-    requests.post(f'http://127.0.0.1:{PORT}/logs', json={'log_entry': message, 'log_level': level}, timeout=1)
+    requests.post(f'http://127.0.0.1:{PORT}/logs', json={'log_entry': message, 'log_level': level}, timeout=2)
     print(f'вышли из send_log')
 
 @app.post("/submit")
@@ -74,8 +75,17 @@ async def submit_form(request: Request, data: RequestModel):
     print('data_------------------')
     pprint(data.__dict__)
     # Assuming 'name' is provided in the request or generated somehow
-    name = ["Last", "First", "Second"]
-    print('name', name)
+    # Splitting the full name into parts
+    full_name = data.fields.full_name.value
+    name_parts = full_name.split(' ')
+
+    # Ensure there are enough parts; if not, fill with empty strings
+    if len(name_parts) < 3:
+        name_parts += [''] * (3 - len(name_parts))
+
+    last_name, first_name, second_name = name_parts[0], name_parts[1], name_parts[2]
+
+    print('name', last_name, first_name, second_name)
     print(f'{data.fields.passport_serial.value=}')
     print(f'{data.fields.issued_by.value=}')
     print(f'{data.fields.issue_date.value=}')
@@ -116,9 +126,9 @@ async def submit_form(request: Request, data: RequestModel):
         }],
         'UF_CRM_PSPRT_NUMBER': data.fields.passport_number.value,
         'UF_CRM_PSPRT_CODE': data.fields.subdivision_code.value,
-        'LAST_NAME': name[0],
-        'NAME': name[1],
-        'SECOND_NAME': name[2],
+        'LAST_NAME': last_name,
+        'NAME': first_name,
+        'SECOND_NAME': second_name,
         'UF_CRM_DSBLT_GROUP': data.fields.group.value,
         'UF_CRM_DSBLT_CERT': data.fields.certificate.value,
         'UF_CRM_TAX_CERT': data.fields.inn.value,
@@ -160,7 +170,7 @@ async def submit_form(request: Request, data: RequestModel):
     #     'UF_CRM_SUBMISSION_ID': data.submission_id,
     # }
     pprint(fields)
-    send_log(f'Заявка от {name[0]}', 'DEBUG')
+    send_log(f'Заявка от {first_name}', 'DEBUG')
     
     # create_lead(fields)
     
@@ -201,7 +211,7 @@ def log_counts_by_minute(logs: list) -> dict:
 async def add_log(log: Request):
     global logs
 
-    pprint(log.__dict__)
+    # pprint(log.__dict__)
     json = await log.json()
     log_entry=json.get('log_entry')
     log_level = json.get('log_level')
