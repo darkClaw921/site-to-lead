@@ -160,7 +160,7 @@ async def submit_form(request: Request, data: RequestModel):
     #     'UF_CRM_SUBMISSION_ID': data.submission_id,
     # }
     pprint(fields)
-    send_log(fields, 'DEBUG')
+    send_log(f'Заявка от {name[0]}', 'DEBUG')
     
     # create_lead(fields)
     
