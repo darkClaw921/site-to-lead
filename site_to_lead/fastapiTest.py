@@ -171,10 +171,13 @@ async def submit_form(data: Request):
     
     
     pprint(fields)
-    send_log(f'Заявка от {first_name}', 'DEBUG')
-    
     create_lead(fields)
-    
+
+    try:
+        send_log(f'Заявка от {first_name}', 'DEBUG')
+    except Exception as e:
+        send_log(f'Ошибка отправки лога: {e}', 'ERROR')
+
     return {"fields": 'OK'}
 
 
