@@ -9,6 +9,7 @@ import requests
 from pprint import pformat, pprint
 from workBitrix import create_lead
 from fastapi.staticfiles import StaticFiles
+from typing import List, Dict
 load_dotenv()
 PORT = os.getenv('PORT')
 HOST = os.getenv('HOST')
@@ -74,6 +75,17 @@ async def submit_form(request: Request):
     pprint(request.__dict__)
     data = await request.json()
     pprint(data)
+
+@app.post("/submit_form/")
+async def submit_form(*, fields: List[str] = Form(...)):
+    form_data: Dict[str, str] = {}
+    pprint(fields)
+    for field in fields:
+        key, value = field.split('=')
+        form_data[key] = value
+
+    pprint(form_data)
+    return form_data
 
 @app.post("/submit")
 async def submit_form(request: Request, data: RequestModel):
