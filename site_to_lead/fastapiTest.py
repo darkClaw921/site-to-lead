@@ -63,7 +63,21 @@ class Fields(BaseModel):
 class RequestModel(BaseModel):
     fields: Fields
     submission_id: str
+class Form(BaseModel):
+    id: str
+    name: str
 
+class FormField(BaseModel):
+    id: str
+    type: str
+    title: str
+    value: str
+    raw_value: str
+    required: bool
+
+class WebhookPayload(BaseModel):
+    form: Form
+    fields: dict[str, FormField]
 def send_log(message, level='INFO'):
     print(f'попали в send_log {message=}, {level=}')
     # requests.post(f'http://{HOST}:{PORT}/logs', json={'log_entry': message, 'log_level': level}, timeout=1)
@@ -76,16 +90,16 @@ async def submit_form(request: Request):
     data = await request.json()
     pprint(data)
 
-@app.post("/submit_form/")
-async def submit_form(*, fields: List[str] = Form(...)):
-    form_data: Dict[str, str] = {}
-    pprint(fields)
-    for field in fields:
-        key, value = field.split('=')
-        form_data[key] = value
+# @app.post("/submit_form")
+# async def submit_form(*, fields: List[str] = Form(...)):
+#     form_data: Dict[str, str] = {}
+#     pprint(fields)
+#     for field in fields:
+#         key, value = field.split('=')
+#         form_data[key] = value
 
-    pprint(form_data)
-    return form_data
+#     pprint(form_data)
+#     return form_data
 
 @app.post("/submit")
 async def submit_form(request: Request, data: RequestModel):
@@ -199,8 +213,25 @@ async def submit_form(request: Request, data: RequestModel):
 
 
 
+@app.post("/webhook2")
+async def handle_webhook(payload: WebhookPayload):
+    # Example processing logic
+    form_id = payload.form.id
+    form_name = payload.form.name
+    pprint(payload.__dict__)
+    # email = payload.fields.get('email').value
+    # name = payload.fields.get('name').value
+    # function = payload.fields.get('fn').value
 
-
+    # Example output
+    # return {
+    #     "form_id": form_id,
+    #     "form_name": form_name,
+    #     "email": email,
+    #     "name": name,
+    #     "function": function
+    # }
+    return {"message": "Webhook received successfully"}
 
 
 #работа с логами
