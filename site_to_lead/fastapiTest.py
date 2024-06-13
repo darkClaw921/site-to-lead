@@ -105,13 +105,13 @@ async def submit_form(request: Request):
 #     return form_data
 
 @app.post("/submit")
-async def submit_form(request: Request, data: RequestModel):
-    pprint(request.__dict__)
-    print('data_------------------')
-    pprint(data.__dict__)
+async def submit_form(data: Request,):
+    # pprint(request.__dict__)
+    # print('data_------------------')
+    # # pprint(data.__dict__)
     # Assuming 'name' is provided in the request or generated somehow
     # Splitting the full name into parts
-    full_name = data.fields.full_name.value
+    full_name = data['fields[ФИО][value]']
     name_parts = full_name.split(' ')
 
     # Ensure there are enough parts; if not, fill with empty strings
@@ -121,95 +121,116 @@ async def submit_form(request: Request, data: RequestModel):
     last_name, first_name, second_name = name_parts[0], name_parts[1], name_parts[2]
 
     print('name', last_name, first_name, second_name)
-    print(f'{data.fields.passport_serial.value=}')
-    print(f'{data.fields.issued_by.value=}')
-    print(f'{data.fields.issue_date.value=}')
-    print(f'{data.fields.registered_street.value=}')
-    print(f'{data.fields.city.value=}')
-    print(f'{data.fields.phone.value=}')
-    print(f'{data.fields.email.value=}')
-    print(f'{data.fields.passport_number.value=}')
-    print(f'{data.fields.subdivision_code.value=}')
-    print(f'{data.fields.group.value=}')
-    print(f'{data.fields.certificate.value=}')
-    print(f'{data.fields.inn.value=}')
-    print(f'{data.fields.snils.value=}')
-    print(f'{data.fields.pc.value=}')
+    print(f"{data['fields[паспорт номер][value]']=}")
+    print(f"{data['fields[Кем выдан][value]']=}")
+    print(f"{data['fields[дата выдачи][value]']=}")
+    print(f"{data['fields[зарегистрирован улица][value]']=}")
+    print(f"{data['fields[город][value]']=}")
+    print(f"{data['fields[телефон][value]']=}")
+    print(f"{data['fields[email][value]']=}")
+    print(f"{data['fields[паспорт серия][value]']=}")
+    print(f"{data['fields[код подразделения][value]']=}")
+    print(f"{data['fields[группа][value]']=}")
+    print(f"{data['fields[справка][value]']=}")
+    print(f"{data['fields[ИНН][value]']=}")
+    print(f"{data['fields[Снилс][value]']=}")
+    print(f"{data['fields[пк][value]']=}")
+    print(f"{data['fields[aaffcfg][value]']=}")
+    print(f"{data['fields[ограничения][value]']=}")
+    print(f"{data['fields[Согласие на обработку][value]']=}")
+    print(f"{data['submission_id']=}")
+    # update_deal(data)
 
-    print(f'{data.fields.aaffcfg.value=}')
-    print(f'{data.fields.restrictions.value=}')
-    print(f'{data.fields.agreement.value=}')
-    print(f'{data.submission_id=}')
+    # print(f'{data.fields.issued_by.value=}')
+    # print(f'{data.fields.issue_date.value=}')
+    # print(f'{data.fields.registered_street.value=}')
+    # print(f'{data.fields.city.value=}')
+    # print(f'{data.fields.phone.value=}')
+    # print(f'{data.fields.email.value=}')
+    # print(f'{data.fields.passport_number.value=}')
+    # print(f'{data.fields.subdivision_code.value=}')
+    # print(f'{data.fields.group.value=}')
+    # print(f'{data.fields.certificate.value=}')
+    # print(f'{data.fields.inn.value=}')
+    # print(f'{data.fields.snils.value=}')
+    # print(f'{data.fields.pc.value=}')
+
+    # print(f'{data.fields.aaffcfg.value=}')
+    # print(f'{data.fields.restrictions.value=}')
+    # print(f'{data.fields.agreement.value=}')
+    # print(f'{data.submission_id=}')
     # update_deal(data)
 
 
-    
-    fields = {
+    fields={
         'TITLE': 'Заявка с сайта',
-        'UF_CRM_PSPRT_SERIAL': data.fields.passport_serial.value,
-        'UF_CRM_PSPRT_ISSUED': data.fields.issued_by.value,
-        'UF_CRM_PSPRT_DATE': data.fields.issue_date.value,
-        'UF_CRM_REG_STREET': data.fields.registered_street.value,
-        'UF_CRM_REG_CITY': data.fields.city.value,
+        'UF_CRM_PSPRT_SERIAL': data['fields[паспорт серия][value]'],
+        'UF_CRM_PSPRT_ISSUED': data['fields[Кем выдан][value]'],
+        'UF_CRM_PSPRT_DATE': data['fields[дата выдачи][value]'],
+        'UF_CRM_REG_STREET': data['fields[зарегистрирован улица][value]'],
+        'UF_CRM_REG_CITY': data['fields[город][value]'],
         'PHONE': [{
-            'VALUE': data.fields.phone.value,
+            'VALUE': data['fields[телефон][value]'],
             'VALUE_TYPE': 'WORK'
         }],
         'EMAIL': [{
-            'VALUE': data.fields.email.value,
+            'VALUE': data['fields[email][value]'],
             'VALUE_TYPE': 'WORK'
         }],
-        'UF_CRM_PSPRT_NUMBER': data.fields.passport_number.value,
-        'UF_CRM_PSPRT_CODE': data.fields.subdivision_code.value,
+        'UF_CRM_PSPRT_NUMBER': data['fields[паспорт номер][value]'],
+        'UF_CRM_PSPRT_CODE': data['fields[код подразделения][value]'],
         'LAST_NAME': last_name,
         'NAME': first_name,
         'SECOND_NAME': second_name,
-        'UF_CRM_DSBLT_GROUP': data.fields.group.value,
-        'UF_CRM_DSBLT_CERT': data.fields.certificate.value,
-        'UF_CRM_TAX_CERT': data.fields.inn.value,
-        'UF_CRM_PENSION_CERT': data.fields.snils.value,
-        'UF_CRM_SKILL_PC': data.fields.pc.value,
-        'UF_CRM_SKILL_WORK': data.fields.aaffcfg.value,
-        'UF_CRM_DISABILITY': data.fields.restrictions.value,
-        'UF_CRM_AGREEMENT': 'Y' if data.fields.agreement.value == 'on' else 'N',
-        'UF_CRM_SUBMISSION_ID': data.submission_id,
+        'UF_CRM_DSBLT_GROUP': data['fields[группа][value]'],
+        'UF_CRM_DSBLT_CERT': data['fields[справка][value]'],
+        'UF_CRM_TAX_CERT': data['fields[ИНН][value]'],
+        'UF_CRM_PENSION_CERT': data['fields[Снилс][value]'],
+        'UF_CRM_SKILL_PC': data['fields[пк][value]'],
+        'UF_CRM_SKILL_WORK': data['fields[aaffcfg][value]'],
+        'UF_CRM_DISABILITY': data['fields[ограничения][value]'],
+        'UF_CRM_AGREEMENT': 'Y' if data['fields[Согласие на обработку][value]'] == 'on' else 'N',
+        'UF_CRM_SUBMISSION_ID': data['submission_id'],
+
     }
+    
     # fields = {
     #     'TITLE': 'Заявка с сайта',
-    #     'UF_CRM_PSPRT_SERIAL': data.fields.паспорт_серия.value,
-    #     'UF_CRM_PSPRT_ISSUED': data.fields.Кем_выдан.value,
-    #     'UF_CRM_PSPRT_DATE': data.fields.дата_выдачи.value,
-    #     'UF_CRM_REG_STREET': data.fields.зарегистрирован_улица.value,
-    #     'UF_CRM_REG_CITY': data.fields.город.value,
+    #     'UF_CRM_PSPRT_SERIAL': data.fields.passport_serial.value,
+    #     'UF_CRM_PSPRT_ISSUED': data.fields.issued_by.value,
+    #     'UF_CRM_PSPRT_DATE': data.fields.issue_date.value,
+    #     'UF_CRM_REG_STREET': data.fields.registered_street.value,
+    #     'UF_CRM_REG_CITY': data.fields.city.value,
     #     'PHONE': [{
-    #         'VALUE': data.fields.телефон.value,
+    #         'VALUE': data.fields.phone.value,
     #         'VALUE_TYPE': 'WORK'
     #     }],
     #     'EMAIL': [{
     #         'VALUE': data.fields.email.value,
     #         'VALUE_TYPE': 'WORK'
     #     }],
-    #     'UF_CRM_PSPRT_NUMBER': data.fields.паспорт_номер.value,
-    #     'UF_CRM_PSPRT_CODE': data.fields.код_подразделения.value,
-    #     'LAST_NAME': name[0],
-    #     'NAME': name[1],
-    #     'SECOND_NAME': name[2],
-    #     'UF_CRM_DSBLT_GROUP': data.fields.группа.value,
-    #     'UF_CRM_DSBLT_CERT': data.fields.справка.value,
-    #     'UF_CRM_TAX_CERT': data.fields.ИНН.value,
-    #     'UF_CRM_PENSION_CERT': data.fields.Снилс.value,
-    #     'UF_CRM_SKILL_PC': data.fields.пк.value,
+    #     'UF_CRM_PSPRT_NUMBER': data.fields.passport_number.value,
+    #     'UF_CRM_PSPRT_CODE': data.fields.subdivision_code.value,
+    #     'LAST_NAME': last_name,
+    #     'NAME': first_name,
+    #     'SECOND_NAME': second_name,
+    #     'UF_CRM_DSBLT_GROUP': data.fields.group.value,
+    #     'UF_CRM_DSBLT_CERT': data.fields.certificate.value,
+    #     'UF_CRM_TAX_CERT': data.fields.inn.value,
+    #     'UF_CRM_PENSION_CERT': data.fields.snils.value,
+    #     'UF_CRM_SKILL_PC': data.fields.pc.value,
     #     'UF_CRM_SKILL_WORK': data.fields.aaffcfg.value,
-    #     'UF_CRM_DISABILITY': data.fields.ограничения.value,
-    #     'UF_CRM_AGREEMENT': 'Y' if data.fields.Согласие_на_обработку.value == 'on' else 'N',
+    #     'UF_CRM_DISABILITY': data.fields.restrictions.value,
+    #     'UF_CRM_AGREEMENT': 'Y' if data.fields.agreement.value == 'on' else 'N',
     #     'UF_CRM_SUBMISSION_ID': data.submission_id,
     # }
+    
     pprint(fields)
     send_log(f'Заявка от {first_name}', 'DEBUG')
     
-    # create_lead(fields)
+    create_lead(fields)
     
-    return {"fields": 'fields'}
+    return {"fields": 'OK'}
 
 
 
