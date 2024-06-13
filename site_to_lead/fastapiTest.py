@@ -33,84 +33,28 @@ class PayData(BaseModel):
     data: dict
     ts: int
 
-class FieldValue(BaseModel):
-    value: str
 
-class PhoneEmailValue(BaseModel):
-    VALUE: str
-    VALUE_TYPE: str
 
-class Fields(BaseModel):
-    passport_serial: FieldValue = Field(..., alias='паспорт_серия')
-    issued_by: FieldValue = Field(..., alias='Кем_выдан')
-    issue_date: FieldValue = Field(..., alias='дата_выдачи')
-    registered_street: FieldValue = Field(..., alias='зарегистрирован_улица')
-    city: FieldValue = Field(..., alias='город')
-    phone: FieldValue = Field(..., alias='телефон')
-    email: FieldValue = Field(..., alias='email')
-    passport_number: FieldValue = Field(..., alias='паспорт_номер')
-    subdivision_code: FieldValue = Field(..., alias='код_подразделения')
-    group: FieldValue = Field(..., alias='группа')
-    certificate: FieldValue = Field(..., alias='справка')
-    inn: FieldValue = Field(..., alias='ИНН')
-    snils: FieldValue = Field(..., alias='Снилс')
-    pc: FieldValue = Field(..., alias='пк')
-    aaffcfg: FieldValue = Field(..., alias='aaffcfg')
-    restrictions: FieldValue = Field(..., alias='ограничения')
-    agreement: FieldValue = Field(..., alias='Согласие_на_обработку')
-    full_name: FieldValue = Field(..., alias='ФИО')  # Adding the ФИО field
 
-class RequestModel(BaseModel):
-    fields: Fields
-    submission_id: str
-class Form(BaseModel):
-    id: str
-    name: str
 
-class FormField(BaseModel):
-    id: str
-    type: str
-    title: str
-    value: str
-    raw_value: str
-    required: bool
-
-class WebhookPayload(BaseModel):
-    form: Form
-    fields: dict[str, FormField]
 def send_log(message, level='INFO'):
     print(f'попали в send_log {message=}, {level=}')
     # requests.post(f'http://{HOST}:{PORT}/logs', json={'log_entry': message, 'log_level': level}, timeout=1)
     requests.post(f'http://127.0.0.1:{PORT}/logs', json={'log_entry': message, 'log_level': level}, timeout=2)
     print(f'вышли из send_log')
 
-@app.post("/submit2")
-async def submit_form(request: Request):
-    pprint(request.__dict__)
-    data =await request.form()
-    pprint(data.__dict__)
-    # print(data.get('key1'))
 
 
 
-# @app.post("/submit_form")
-# async def submit_form(*, fields: List[str] = Form(...)):
-#     form_data: Dict[str, str] = {}
-#     pprint(fields)
-#     for field in fields:
-#         key, value = field.split('=')
-#         form_data[key] = value
-
-#     pprint(form_data)
-#     return form_data
 
 @app.post("/submit")
-async def submit_form(data: Request,):
+async def submit_form(data: Request):
     # pprint(request.__dict__)
     # print('data_------------------')
     # # pprint(data.__dict__)
     # Assuming 'name' is provided in the request or generated somehow
     # Splitting the full name into parts
+    data=await data.form()
     full_name = data['fields[ФИО][value]']
     name_parts = full_name.split(' ')
 
@@ -121,8 +65,26 @@ async def submit_form(data: Request,):
     last_name, first_name, second_name = name_parts[0], name_parts[1], name_parts[2]
 
     print('name', last_name, first_name, second_name)
-    print(f"{data['fields[паспорт номер][value]']=}")
-    print(f"{data['fields[Кем выдан][value]']=}")
+    print(f"{data.get('fields[паспорт номер][value]')=}")
+    print(f"{data.get('fields[Кем выдан][value]')=}")
+    print(f"{data.get('fields[дата выдачи][value]')=}")
+    print(f"{data.get('fields[зарегистрирован улица][value]')=}")
+    print(f"{data.get('fields[город][value]')=}")
+    print(f"{data.get('fields[телефон][value]')=}")
+    print(f"{data.get('fields[email][value]')=}")
+    print(f"{data.get('fields[паспорт серия][value]')=}")
+    print(f"{data.get('fields[код подразделения][value]')=}")
+    print(f"{data.get('fields[группа][value]')=}")
+    print(f"{data.get('fields[справка][value]')=}")
+    print(f"{data.get('fields[ИНН][value]')=}")
+    print(f"{data.get('fields[Снилс][value]')=}")
+    print(f"{data.get('fields[пк][value]')=}")
+    print(f"{data.get('fields[aaffcfg][value]')=}")
+    print(f"{data.get('fields[ограничения][value]')=}")
+    print(f"{data.get('fields[Согласие на обработку][value]')=}")
+    print(f"{data.get('submission_id')=}")
+    # update_deal(data)
+    
     print(f"{data['fields[дата выдачи][value]']=}")
     print(f"{data['fields[зарегистрирован улица][value]']=}")
     print(f"{data['fields[город][value]']=}")
@@ -141,89 +103,72 @@ async def submit_form(data: Request,):
     print(f"{data['submission_id']=}")
     # update_deal(data)
 
-    # print(f'{data.fields.issued_by.value=}')
-    # print(f'{data.fields.issue_date.value=}')
-    # print(f'{data.fields.registered_street.value=}')
-    # print(f'{data.fields.city.value=}')
-    # print(f'{data.fields.phone.value=}')
-    # print(f'{data.fields.email.value=}')
-    # print(f'{data.fields.passport_number.value=}')
-    # print(f'{data.fields.subdivision_code.value=}')
-    # print(f'{data.fields.group.value=}')
-    # print(f'{data.fields.certificate.value=}')
-    # print(f'{data.fields.inn.value=}')
-    # print(f'{data.fields.snils.value=}')
-    # print(f'{data.fields.pc.value=}')
-
-    # print(f'{data.fields.aaffcfg.value=}')
-    # print(f'{data.fields.restrictions.value=}')
-    # print(f'{data.fields.agreement.value=}')
-    # print(f'{data.submission_id=}')
-    # update_deal(data)
 
 
     fields={
         'TITLE': 'Заявка с сайта',
-        'UF_CRM_PSPRT_SERIAL': data['fields[паспорт серия][value]'],
-        'UF_CRM_PSPRT_ISSUED': data['fields[Кем выдан][value]'],
-        'UF_CRM_PSPRT_DATE': data['fields[дата выдачи][value]'],
-        'UF_CRM_REG_STREET': data['fields[зарегистрирован улица][value]'],
-        'UF_CRM_REG_CITY': data['fields[город][value]'],
+        'UF_CRM_PSPRT_SERIAL': data.get('fields[паспорт серия][value]'),
+        'UF_CRM_PSPRT_ISSUED': data.get('fields[Кем выдан][value]'),    
+        'UF_CRM_PSPRT_DATE': data.get('fields[дата выдачи][value]'),
+        'UF_CRM_REG_STREET': data.get('fields[зарегистрирован улица][value]'),
+        'UF_CRM_REG_CITY': data.get('fields[город][value]'),
         'PHONE': [{
-            'VALUE': data['fields[телефон][value]'],
+            'VALUE': data.get('fields[телефон][value]'),
             'VALUE_TYPE': 'WORK'
         }],
         'EMAIL': [{
-            'VALUE': data['fields[email][value]'],
+            'VALUE': data.get('fields[email][value]'),
             'VALUE_TYPE': 'WORK'
         }],
-        'UF_CRM_PSPRT_NUMBER': data['fields[паспорт номер][value]'],
-        'UF_CRM_PSPRT_CODE': data['fields[код подразделения][value]'],
+        'UF_CRM_PSPRT_NUMBER': data.get('fields[паспорт номер][value]'),
+        'UF_CRM_PSPRT_CODE': data.get('fields[код подразделения][value]'),
         'LAST_NAME': last_name,
         'NAME': first_name,
         'SECOND_NAME': second_name,
-        'UF_CRM_DSBLT_GROUP': data['fields[группа][value]'],
-        'UF_CRM_DSBLT_CERT': data['fields[справка][value]'],
-        'UF_CRM_TAX_CERT': data['fields[ИНН][value]'],
-        'UF_CRM_PENSION_CERT': data['fields[Снилс][value]'],
-        'UF_CRM_SKILL_PC': data['fields[пк][value]'],
-        'UF_CRM_SKILL_WORK': data['fields[aaffcfg][value]'],
-        'UF_CRM_DISABILITY': data['fields[ограничения][value]'],
-        'UF_CRM_AGREEMENT': 'Y' if data['fields[Согласие на обработку][value]'] == 'on' else 'N',
-        'UF_CRM_SUBMISSION_ID': data['submission_id'],
+        'UF_CRM_DSBLT_GROUP': data.get('fields[группа][value]'),
+        'UF_CRM_DSBLT_CERT': data.get('fields[справка][value]'),
+        'UF_CRM_TAX_CERT': data.get('fields[ИНН][value]'),
+        'UF_CRM_PENSION_CERT': data.get('fields[Снилс][value]'),
+        'UF_CRM_SKILL_PC': data.get('fields[пк][value]'),
+        'UF_CRM_SKILL_WORK': data.get('fields[aaffcfg][value]'),
+        'UF_CRM_DISABILITY': data.get('fields[ограничения][value]'),
+        'UF_CRM_AGREEMENT': 'Y' if data.get('fields[Согласие на обработку][value]') == 'on' else 'N',
+        'UF_CRM_SUBMISSION_ID': data.get('submission_id'),
 
+        
     }
-    
-    # fields = {
+    # fields={
     #     'TITLE': 'Заявка с сайта',
-    #     'UF_CRM_PSPRT_SERIAL': data.fields.passport_serial.value,
-    #     'UF_CRM_PSPRT_ISSUED': data.fields.issued_by.value,
-    #     'UF_CRM_PSPRT_DATE': data.fields.issue_date.value,
-    #     'UF_CRM_REG_STREET': data.fields.registered_street.value,
-    #     'UF_CRM_REG_CITY': data.fields.city.value,
+    #     'UF_CRM_PSPRT_SERIAL': data['fields[паспорт серия][value]'],
+    #     'UF_CRM_PSPRT_ISSUED': data['fields[Кем выдан][value]'],
+    #     'UF_CRM_PSPRT_DATE': data['fields[дата выдачи][value]'],
+    #     'UF_CRM_REG_STREET': data['fields[зарегистрирован улица][value]'],
+    #     'UF_CRM_REG_CITY': data['fields[город][value]'],
     #     'PHONE': [{
-    #         'VALUE': data.fields.phone.value,
+    #         'VALUE': data['fields[телефон][value]'],
     #         'VALUE_TYPE': 'WORK'
     #     }],
     #     'EMAIL': [{
-    #         'VALUE': data.fields.email.value,
+    #         'VALUE': data['fields[email][value]'],
     #         'VALUE_TYPE': 'WORK'
     #     }],
-    #     'UF_CRM_PSPRT_NUMBER': data.fields.passport_number.value,
-    #     'UF_CRM_PSPRT_CODE': data.fields.subdivision_code.value,
+    #     'UF_CRM_PSPRT_NUMBER': data['fields[паспорт номер][value]'],
+    #     'UF_CRM_PSPRT_CODE': data['fields[код подразделения][value]'],
     #     'LAST_NAME': last_name,
     #     'NAME': first_name,
     #     'SECOND_NAME': second_name,
-    #     'UF_CRM_DSBLT_GROUP': data.fields.group.value,
-    #     'UF_CRM_DSBLT_CERT': data.fields.certificate.value,
-    #     'UF_CRM_TAX_CERT': data.fields.inn.value,
-    #     'UF_CRM_PENSION_CERT': data.fields.snils.value,
-    #     'UF_CRM_SKILL_PC': data.fields.pc.value,
-    #     'UF_CRM_SKILL_WORK': data.fields.aaffcfg.value,
-    #     'UF_CRM_DISABILITY': data.fields.restrictions.value,
-    #     'UF_CRM_AGREEMENT': 'Y' if data.fields.agreement.value == 'on' else 'N',
-    #     'UF_CRM_SUBMISSION_ID': data.submission_id,
+    #     'UF_CRM_DSBLT_GROUP': data['fields[группа][value]'],
+    #     'UF_CRM_DSBLT_CERT': data['fields[справка][value]'],
+    #     'UF_CRM_TAX_CERT': data['fields[ИНН][value]'],
+    #     'UF_CRM_PENSION_CERT': data['fields[Снилс][value]'],
+    #     'UF_CRM_SKILL_PC': data['fields[пк][value]'],
+    #     'UF_CRM_SKILL_WORK': data['fields[aaffcfg][value]'],
+    #     'UF_CRM_DISABILITY': data['fields[ограничения][value]'],
+    #     'UF_CRM_AGREEMENT': 'Y' if data['fields[Согласие на обработку][value]'] == 'on' else 'N',
+    #     'UF_CRM_SUBMISSION_ID': data['submission_id'],
+# 
     # }
+    
     
     pprint(fields)
     send_log(f'Заявка от {first_name}', 'DEBUG')
@@ -235,27 +180,6 @@ async def submit_form(data: Request,):
 
 
 
-
-
-@app.post("/webhook2")
-async def handle_webhook(payload: WebhookPayload):
-    # Example processing logic
-    form_id = payload.form.id
-    form_name = payload.form.name
-    pprint(payload.__dict__)
-    # email = payload.fields.get('email').value
-    # name = payload.fields.get('name').value
-    # function = payload.fields.get('fn').value
-
-    # Example output
-    # return {
-    #     "form_id": form_id,
-    #     "form_name": form_name,
-    #     "email": email,
-    #     "name": name,
-    #     "function": function
-    # }
-    return {"message": "Webhook received successfully"}
 
 
 #работа с логами
