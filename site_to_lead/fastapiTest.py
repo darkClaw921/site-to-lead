@@ -69,6 +69,12 @@ def send_log(message, level='INFO'):
     requests.post(f'http://127.0.0.1:{PORT}/logs', json={'log_entry': message, 'log_level': level}, timeout=2)
     print(f'вышли из send_log')
 
+@app.post("/submit2")
+async def submit_form(request: Request, data: RequestModel):
+    pprint(request.__dict__)
+    data = await request.json()
+    pprint(data)
+    
 @app.post("/submit")
 async def submit_form(request: Request, data: RequestModel):
     pprint(request.__dict__)
