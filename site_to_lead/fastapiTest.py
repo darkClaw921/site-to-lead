@@ -87,8 +87,11 @@ def send_log(message, level='INFO'):
 @app.post("/submit2")
 async def submit_form(request: Request):
     pprint(request.__dict__)
-    data =request.form()
+    data =await request.form()
     pprint(data.__dict__)
+    # print(data.get('key1'))
+
+
 
 # @app.post("/submit_form")
 # async def submit_form(*, fields: List[str] = Form(...)):
